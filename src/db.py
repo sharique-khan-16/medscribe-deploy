@@ -157,7 +157,7 @@ def save_extraction(result: ExtractionResult) -> int:
         return record_id
 
 
-def get_all_records() -> List[Dict[str, Any]]:
+def get_all_records() -> list[dict[str, Any]]:
     """Query and return all medical records reconstructed with patient and relation data."""
     init_db()
     records_list = []

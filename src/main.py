@@ -34,7 +34,7 @@ UPLOAD_DIR = os.path.join("data", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
-def get_status() -> Dict[str, Any]:
+def get_status() -> dict[str, Any]:
     """Returns the backend service health status."""
     return {
         "status": "healthy",
@@ -46,7 +46,7 @@ def get_status() -> Dict[str, Any]:
 
 @app.get("/health", tags=["Health"])
 @app.get("/status", tags=["Health"])
-async def health() -> Dict[str, Any]:
+async def health() -> dict[str, Any]:
     """Health check endpoint."""
     return get_status()
 
@@ -103,7 +103,7 @@ async def upload_prescription(file: UploadFile = File(...)):
 
 
 @app.get("/records", tags=["Records"])
-async def get_records() -> List[Dict[str, Any]]:
+async def get_records() -> list[dict[str, Any]]:
     """Retrieves all processed medical records from the database."""
     try:
         return get_all_records()

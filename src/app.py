@@ -26,7 +26,7 @@ app.add_middleware(
 
 
 @app.get("/", tags=["Health"])
-async def root() -> Dict[str, Any]:
+async def root() -> dict[str, Any]:
     """Root endpoint - health check."""
     return {
         "status": "healthy",
@@ -39,7 +39,7 @@ async def root() -> Dict[str, Any]:
 
 
 @app.get("/health", tags=["Health"])
-async def health_check() -> Dict[str, Any]:
+async def health_check() -> dict[str, Any]:
     """Detailed health check endpoint."""
     return {
         "status": "healthy",
@@ -51,7 +51,7 @@ async def health_check() -> Dict[str, Any]:
 
 
 @app.get("/status", tags=["Health"])
-async def get_status() -> Dict[str, Any]:
+async def get_status() -> dict[str, Any]:
     """Returns the backend service health status."""
     return {
         "status": "healthy",
@@ -62,7 +62,7 @@ async def get_status() -> Dict[str, Any]:
 
 
 @app.exception_handler(404)
-async def not_found_handler(request, exc):
+async def not_found_handler(_request, _exc):
     """Custom 404 handler."""
     return JSONResponse(
         status_code=404,
@@ -74,7 +74,7 @@ async def not_found_handler(request, exc):
 
 
 @app.exception_handler(500)
-async def internal_error_handler(request, exc):
+async def internal_error_handler(_request, _exc):
     """Custom 500 handler."""
     return JSONResponse(
         status_code=500,

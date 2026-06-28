@@ -12,38 +12,38 @@ logger = logging.getLogger("medscribe.extractor")
 
 class PatientModel(BaseModel):
     name: str
-    age: Optional[int] = None
-    gender: Optional[str] = None
+    age: int | None = None
+    gender: str | None = None
 
 
 class RecordModel(BaseModel):
     type: Literal["prescription", "lab_report"]
-    date: Optional[str] = None
-    doctor_name: Optional[str] = None
-    facility: Optional[str] = None
+    date: str | None = None
+    doctor_name: str | None = None
+    facility: str | None = None
 
 
 class MedicationModel(BaseModel):
     name: str
     dosage: str
     frequency: str
-    duration: Optional[str] = None
+    duration: str | None = None
 
 
 class LabResultModel(BaseModel):
     test_name: str
     value: str
-    unit: Optional[str] = None
-    reference_range: Optional[str] = None
-    flag: Optional[Literal["normal", "high", "low"]] = None
+    unit: str | None = None
+    reference_range: str | None = None
+    flag: Literal["normal", "high", "low"] | None = None
 
 
 class ExtractionResult(BaseModel):
     patient: PatientModel
     record: RecordModel
-    medications: List[MedicationModel] = Field(default_factory=list)
-    diagnosis: Optional[str] = None
-    lab_results: List[LabResultModel] = Field(default_factory=list)
+    medications: list[MedicationModel] = Field(default_factory=list)
+    diagnosis: str | None = None
+    lab_results: list[LabResultModel] = Field(default_factory=list)
     extraction_confidence: Literal["high", "medium", "low"]
 
 
