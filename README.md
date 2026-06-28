@@ -73,8 +73,8 @@ ollama pull phi3.5:mini
 
 ### 3. Clone and Scaffold
 ```bash
-git clone https://code.swecha.org/<namespace>/medscribe.git
-cd medscribe
+git clone https://code.swecha.org/shariquekhan/hackathon-3.git
+cd hackathon-3
 ```
 
 ### 4. Set Up Python Virtual Environment
