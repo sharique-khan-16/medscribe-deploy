@@ -6,6 +6,7 @@ import shutil
 from typing import Any
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from src.ocr import extract_text
 from src.extractor import extract_data, ExtractionResult
@@ -32,6 +33,12 @@ app.add_middleware(
 
 UPLOAD_DIR = os.path.join("data", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    """Redirect root URL to interactive API docs."""
+    return RedirectResponse(url="/docs")
 
 
 def get_status() -> dict[str, Any]:
