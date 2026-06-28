@@ -1,0 +1,166 @@
+image: python:3.11-slim
+
+stages:
+  - lint
+  - type-check
+  - security
+  - test
+  - commit-quality
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - .venv/
+
+before_script:
+  - python -m venv .venv
+  - source .venv/bin/activate
+  - pip install --upgrade pip
+  - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
+
+# ==========================================
+# STAGE: lint
+# ==========================================
+
+python-lint:
+  stage: lint
+  script:
+    - ruff check src/
+
+python-format:
+  stage: lint
+  script:
+    - black --check src/
+
+# ==========================================
+# STAGE: type-check
+# ==========================================
+
+python-typecheck:
+  stage: type-check
+  script:
+    - mypy src/
+
+# ==========================================
+# STAGE: security
+# ==========================================
+
+python-security:
+  stage: security
+  script:
+    - bandit -r src/
+
+dependency-audit:
+  stage: security
+  script:
+    # Run audit on requirements to ensure no known vulnerabilities exist
+    - pip-audit -r requirements.txt -r requirements-dev.txt
+
+secret-scanning:
+  stage: security
+  before_script: [] # Skip general pip setup to run fast
+  script:
+    # Run a Python-based search script to detect credentials, keys, and high entropy strings
+    - python -c "
+      import os, re;
+      patterns = [
+          re.compile(r'(?i)(password|passwd|secret|api_key|token|auth|credentials)\s*=\s*[\'\"][^\'\"]+[\'\"]'),
+          re.compile(r'(?i)ghp_[a-zA-Z0-9]{36}')
+      ];
+      found = False;
+      for root, _, files in os.walk('.'):
+          if any(p in root for p in ['.git', '.venv', '.cache']): continue
+          for file in files:
+              if file.endswith('.py') or file.endswith('.json') or file.endswith('.md'):
+                  path = os.path.join(root, file)
+                  with open(path, 'r', errors='ignore') as f:
+                      for i, line in enumerate(f, 1):
+                          for p in patterns:
+                              if p.search(line):
+                                  print(f'🚨 Possible Secret Found in {path}:{i} - {line.strip()}');
+                                  found = True;
+      if found: exit(1)
+      "
+
+# ==========================================
+# STAGE: test
+# ==========================================
+
+python-unittest:
+  stage: test
+  script:
+    - PYTHONPATH=. pytest src/
+
+# ==========================================
+# STAGE: commit-quality
+# ==========================================
+
+commit-quality:
+  stage: commit-quality
+  before_script:
+    - apt-get update && apt-get install -y git
+  script:
+    # Validate the semantic structure of the last 5 commits
+    - git log --format=%s -n 5 > commits.txt
+    - python -c "
+      import re, sys;
+      pattern = re.compile(r'^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)((\([a-z0-9_-]+\))?)?: .+');
+      valid = True;
+      with open('commits.txt', 'r') as f:
+          for commit in f:
+              commit = commit.strip();
+              if not commit: continue;
+              if not pattern.match(commit):
+                  print(f'❌ Non-semantic commit message detected: \"{commit}\"');
+                  valid = False;
+      if not valid:
+          print('Please follow the Conventional Commits specification (e.g., feat: add upload route).');
+          sys.exit(1);
+      "
+
+# ==========================================
+# STAGE: syntax-validation
+# ==========================================
+
+yaml-syntax-validation:
+  stage: lint
+  before_script:
+    - pip install pyyaml
+  script:
+    # Verifies all YAML files are syntactically correct
+    - python -c "
+      import os, yaml;
+      for root, _, files in os.walk('.'):
+          if any(p in root for p in ['.git', '.venv', '.cache']): continue
+          for file in files:
+              if file.endswith(('.yml', '.yaml')):
+                  path = os.path.join(root, file)
+                  try:
+                      with open(path, 'r') as f: yaml.safe_load(f)
+                  except Exception as e:
+                      print(f'❌ Invalid YAML: {path} - {e}');
+                      exit(1);
+      "
+
+json-syntax-validation:
+  stage: lint
+  before_script: [] # Skip general pip setup
+  script:
+    # Verifies all JSON files are syntactically correct
+    - python -c "
+      import os, json;
+      for root, _, files in os.walk('.'):
+          if any(p in root for p in ['.git', '.venv', '.cache']): continue
+          for file in files:
+              if file.endswith('.json'):
+                  path = os.path.join(root, file)
+                  try:
+                      with open(path, 'r') as f: json.load(f)
+                  except Exception as e:
+                      print(f'❌ Invalid JSON: {path} - {e}');
+                      exit(1);
+      "

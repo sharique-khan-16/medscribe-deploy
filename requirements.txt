@@ -1,0 +1,9 @@
+# Runtime Dependencies
+fastapi>=0.100.0
+uvicorn>=0.22.0
+pytesseract>=0.3.10
+pillow>=9.5.0
+opencv-python-headless>=4.7.0
+ollama>=0.1.0
+pydantic>=2.0.0
+jsonschema>=4.17.3
