@@ -1,0 +1,9 @@
+# Dev Dependencies
+pytest>=7.3.1
+black>=23.3.0
+ruff>=0.0.270
+mypy>=1.3.0
+bandit>=1.7.5
+pip-audit>=2.5.5
+types-jsonschema>=4.17.0.10
+pyyaml>=6.0
