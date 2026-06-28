@@ -19,7 +19,7 @@ def get_connection():
 def init_db():
     """Create the SQLite database tables if they do not exist."""
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    
+
     with get_connection() as conn:
         # 1. Patients Table
         conn.execute("""
@@ -85,7 +85,7 @@ def save_extraction(result: ExtractionResult) -> int:
 
     with get_connection() as conn:
         cursor = conn.cursor()
-        
+
         # 1. Insert or update patient
         cursor.execute(
             """
@@ -96,14 +96,16 @@ def save_extraction(result: ExtractionResult) -> int:
                 gender = COALESCE(excluded.gender, patients.gender)
             RETURNING id;
             """,
-            (result.patient.name, result.patient.age, result.patient.gender)
+            (result.patient.name, result.patient.age, result.patient.gender),
         )
         patient_row = cursor.fetchone()
         if patient_row:
             patient_id = patient_row["id"]
         else:
             # Fallback if RETURNING clause is not supported on old sqlite versions
-            cursor.execute("SELECT id FROM patients WHERE name = ?;", (result.patient.name,))
+            cursor.execute(
+                "SELECT id FROM patients WHERE name = ?;", (result.patient.name,)
+            )
             patient_id = cursor.fetchone()["id"]
 
         # 2. Insert record
@@ -119,8 +121,8 @@ def save_extraction(result: ExtractionResult) -> int:
                 result.record.doctor_name,
                 result.record.facility,
                 result.diagnosis,
-                result.extraction_confidence
-            )
+                result.extraction_confidence,
+            ),
         )
         record_id = cursor.lastrowid
 
@@ -131,7 +133,7 @@ def save_extraction(result: ExtractionResult) -> int:
                 INSERT INTO medications (record_id, name, dosage, frequency, duration)
                 VALUES (?, ?, ?, ?, ?);
                 """,
-                (record_id, med.name, med.dosage, med.frequency, med.duration)
+                (record_id, med.name, med.dosage, med.frequency, med.duration),
             )
 
         # 4. Insert lab results
@@ -141,9 +143,16 @@ def save_extraction(result: ExtractionResult) -> int:
                 INSERT INTO lab_results (record_id, test_name, value, unit, reference_range, flag)
                 VALUES (?, ?, ?, ?, ?, ?);
                 """,
-                (record_id, lab.test_name, lab.value, lab.unit, lab.reference_range, lab.flag)
+                (
+                    record_id,
+                    lab.test_name,
+                    lab.value,
+                    lab.unit,
+                    lab.reference_range,
+                    lab.flag,
+                ),
             )
-        
+
         conn.commit()
         return record_id
 
@@ -156,51 +165,51 @@ def get_all_records() -> List[Dict[str, Any]]:
     with get_connection() as conn:
         cursor = conn.cursor()
         # Query main record and patient info
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT r.id as record_id, r.type, r.date, r.doctor_name, r.facility, r.diagnosis, r.extraction_confidence,
                    p.name as patient_name, p.age as patient_age, p.gender as patient_gender
             FROM records r
             JOIN patients p ON r.patient_id = p.id
             ORDER BY r.id DESC;
-            """
-        )
+            """)
         rows = cursor.fetchall()
 
         for row in rows:
             record_id = row["record_id"]
-            
+
             # Fetch medications for this record
             cursor.execute(
                 "SELECT name, dosage, frequency, duration FROM medications WHERE record_id = ?;",
-                (record_id,)
+                (record_id,),
             )
             medications = [dict(m) for m in cursor.fetchall()]
 
             # Fetch lab results for this record
             cursor.execute(
                 "SELECT test_name, value, unit, reference_range, flag FROM lab_results WHERE record_id = ?;",
-                (record_id,)
+                (record_id,),
             )
-            lab_results = [dict(l) for l in cursor.fetchall()]
+            lab_results = [dict(lab_row) for lab_row in cursor.fetchall()]
 
-            records_list.append({
-                "id": record_id,
-                "patient": {
-                    "name": row["patient_name"],
-                    "age": row["patient_age"],
-                    "gender": row["patient_gender"]
-                },
-                "record": {
-                    "type": row["type"],
-                    "date": row["date"],
-                    "doctor_name": row["doctor_name"],
-                    "facility": row["facility"]
-                },
-                "diagnosis": row["diagnosis"],
-                "medications": medications,
-                "lab_results": lab_results,
-                "extraction_confidence": row["extraction_confidence"]
-            })
+            records_list.append(
+                {
+                    "id": record_id,
+                    "patient": {
+                        "name": row["patient_name"],
+                        "age": row["patient_age"],
+                        "gender": row["patient_gender"],
+                    },
+                    "record": {
+                        "type": row["type"],
+                        "date": row["date"],
+                        "doctor_name": row["doctor_name"],
+                        "facility": row["facility"],
+                    },
+                    "diagnosis": row["diagnosis"],
+                    "medications": medications,
+                    "lab_results": lab_results,
+                    "extraction_confidence": row["extraction_confidence"],
+                }
+            )
 
     return records_list

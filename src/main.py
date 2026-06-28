@@ -6,7 +6,6 @@ import shutil
 from typing import Dict, Any, List
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
 from src.ocr import extract_text
 from src.extractor import extract_data, ExtractionResult
@@ -56,35 +55,38 @@ async def health() -> Dict[str, Any]:
 async def upload_prescription(file: UploadFile = File(...)):
     """Accepts a prescription/report image, runs OCR, extracts structured data, and saves to SQLite."""
     # Validate file extension
-    ext = os.path.splitext(file.filename)[1].lower()
+    orig_filename = file.filename or "file"
+    ext = os.path.splitext(orig_filename)[1].lower()
     if ext not in [".jpg", ".jpeg", ".png", ".pdf"]:
         raise HTTPException(
             status_code=400,
-            detail="Unsupported file format. Please upload a JPG, PNG, or PDF."
+            detail="Unsupported file format. Please upload a JPG, PNG, or PDF.",
         )
 
     # Save file to upload directory
     unique_id = uuid.uuid4().hex[:8]
-    filename = f"{unique_id}_{file.filename}"
+    filename = f"{unique_id}_{orig_filename}"
     file_path = os.path.join(UPLOAD_DIR, filename)
 
     try:
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save uploaded file: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to save uploaded file: {e}"
+        )
 
     # Process pipeline
     try:
         # 1. OCR Ingestion
         raw_text = extract_text(file_path)
-        
+
         # 2. Ollama structured data extraction & validation
         extraction = extract_data(raw_text)
-        
+
         # 3. Save to database
         save_extraction(extraction)
-        
+
         return extraction
 
     except ValueError as val_err:
@@ -111,4 +113,5 @@ async def get_records() -> List[Dict[str, Any]]:
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)

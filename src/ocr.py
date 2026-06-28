@@ -3,7 +3,7 @@
 import os
 import cv2
 import numpy as np
-import pytesseract
+import pytesseract  # type: ignore
 from PIL import Image
 
 # Set the Tesseract binary path on Windows if it exists

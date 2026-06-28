@@ -140,7 +140,9 @@ def extract_data(ocr_text: str) -> ExtractionResult:
         return parse_and_validate(content)
 
     except (json.JSONDecodeError, ValidationError, Exception) as first_err:
-        logger.warning(f"First extraction attempt failed: {first_err}. Retrying once...")
+        logger.warning(
+            f"First extraction attempt failed: {first_err}. Retrying once..."
+        )
 
         # Construct retry prompt with error feedback
         retry_prompt = (
@@ -160,7 +162,9 @@ def extract_data(ocr_text: str) -> ExtractionResult:
             return parse_and_validate(content)
 
         except Exception as second_err:
-            logger.error(f"Second extraction attempt failed: {second_err}. Returning fallback result.")
+            logger.error(
+                f"Second extraction attempt failed: {second_err}. Returning fallback result."
+            )
             # Fallback graceful error object
             return ExtractionResult(
                 patient=PatientModel(name="Unknown"),
