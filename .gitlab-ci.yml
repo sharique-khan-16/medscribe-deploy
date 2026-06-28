@@ -84,6 +84,8 @@ dependency-audit:
 
 semgrep-security:
   stage: security
+  image: returntocorp/semgrep
+  before_script: []
   script:
     - semgrep --config=auto src/
 
@@ -177,10 +179,8 @@ commit-quality:
 
 git-cliff-changelog:
   stage: commit-quality
-  image: python:3.11-alpine
-  before_script:
-    - apk add --no-cache git
-    - pip install git-cliff
+  image: orhun/git-cliff:latest
+  before_script: []
   script:
     - git-cliff --config cliff.toml -o CHANGELOG.md
 
