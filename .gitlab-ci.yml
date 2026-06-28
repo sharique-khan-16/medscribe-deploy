@@ -84,14 +84,18 @@ dependency-audit:
 
 semgrep-security:
   stage: security
-  image: returntocorp/semgrep
+  image:
+    name: returntocorp/semgrep
+    entrypoint: [""]
   before_script: []
   script:
     - semgrep --config=auto src/
 
 gitleaks-security:
   stage: security
-  image: zricethezav/gitleaks
+  image:
+    name: zricethezav/gitleaks
+    entrypoint: [""]
   before_script: []
   script:
     - gitleaks detect --verbose --source .
@@ -179,7 +183,9 @@ commit-quality:
 
 git-cliff-changelog:
   stage: commit-quality
-  image: orhunp/git-cliff:latest
+  image:
+    name: orhunp/git-cliff:latest
+    entrypoint: [""]
   before_script: []
   script:
     - git-cliff --config cliff.toml -o CHANGELOG.md
