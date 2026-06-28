@@ -48,7 +48,7 @@ flowchart TD
 
 ---
 
-## 🚀 Setup Instructions
+## 📥 Installation
 
 Follow these steps to set up MedScribe on your local machine for offline execution:
 
@@ -81,6 +81,7 @@ cd hackathon-3
 ```bash
 # Create and activate environment
 python -m venv .venv
+
 # On Windows (PowerShell):
 .\.venv\Scripts\Activate.ps1
 # On Linux/macOS:
@@ -88,7 +89,39 @@ source .venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
+pip install -r requirements-dev.txt
 ```
+
+---
+
+## 💻 Usage
+
+### Running the API Server
+Start the local FastAPI application:
+```bash
+python src/main.py
+```
+This launches the server locally at `http://localhost:8000`.
+
+### Ingesting Documents (OCR + LLM Pipeline)
+You can upload prescription or lab report images via the `/upload` API endpoint:
+```bash
+curl -X POST -F "file=@/path/to/prescription.png" http://localhost:8000/upload
+```
+This automatically:
+1. Performs OCR text extraction using Tesseract.
+2. Formats and validates the extraction schema using Ollama (`qwen2.5:1.5b`).
+3. Saves the validated records locally in SQLite (`data/medscribe.db`).
+
+### Retrieving Records
+To fetch all digitized records:
+```bash
+curl http://localhost:8000/records
+```
+
+### Accessing Interactive API Docs
+*   **Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
+*   **ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ---
 
@@ -145,17 +178,53 @@ Expected response:
 }
 ```
 
-### API Documentation
-
-After deployment, access:
-- **Swagger UI:** `https://medscribe-api.onrender.com/docs`
-- **ReDoc:** `https://medscribe-api.onrender.com/redoc`
-
 ### Notes
+- The free tier on Render may spin down after 15 minutes of inactivity.
+- First request after spin-down may take 30-60 seconds to respond.
 
-- The free tier on Render may spin down after 15 minutes of inactivity
-- First request after spin-down may take 30-60 seconds to respond
-- For production use, consider upgrading to a paid plan for always-on service
+---
+
+## 🤝 Contributing
+
+We welcome contributions to MedScribe! To contribute, follow these guidelines:
+
+### Development Workflow
+1. **Fork/Clone** the repository.
+2. **Create a feature branch** for your work:
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+3. **Write code** and ensure tests pass.
+4. **Format & Lint** your code (see below) to ensure it satisfies CI checks.
+5. **Commit with Conventional Commits** style (e.g., `feat: add PDF ingestion`, `fix: handle OCR edge cases`).
+6. **Push and Open a Merge Request** against the `main` branch.
+
+### Formatting & Linting Conventions
+Our CI pipeline enforces strict code quality checks. Before committing, please run:
+*   **Black** (code formatter):
+    ```bash
+    black src/
+    ```
+*   **Ruff** (fast style check & cleanup):
+    ```bash
+    ruff check src/ --fix
+    ```
+*   **Vulture** (dead code detection):
+    ```bash
+    vulture src/ --min-confidence 80
+    ```
+*   **Bandit** (security audits):
+    ```bash
+    bandit -r src/
+    ```
+
+### Running Tests
+To run unit and integration tests locally:
+```bash
+pytest tests/
+```
+
+---
 
 ## 🔒 Offline Proof (Verification Guide)
 
