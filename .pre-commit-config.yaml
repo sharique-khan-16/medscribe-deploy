@@ -20,3 +20,45 @@ repos:
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-jsonschema, pyyaml]
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: ["-r", "-lll"]
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.0
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.15.0
+    hooks:
+      - id: pyupgrade
+        args: [--py311-plus]
+
+  - repo: https://github.com/pre-commit/mirrors-vulture
+    rev: v2.7
+    hooks:
+      - id: vulture
+
+  - repo: https://github.com/pylint-dev/pylint
+    rev: v3.0.1
+    hooks:
+      - id: pylint
+        args: [--disable=all, --enable=import-error,useful-imports]
+
+  - repo: https://github.com/returntocorp/semgrep
+    rev: v1.50.0
+    hooks:
+      - id: semgrep
+        args: [--config=auto]
+
+

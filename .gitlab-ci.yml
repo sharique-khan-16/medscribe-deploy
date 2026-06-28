@@ -1,10 +1,12 @@
 image: python:3.11-slim
 
 stages:
+  - format
   - lint
   - type-check
   - security
   - test
+  - coverage
   - commit-quality
 
 variables:
@@ -23,6 +25,16 @@ before_script:
   - pip install -r requirements-dev.txt
 
 # ==========================================
+# STAGE: format
+# ==========================================
+
+python-format:
+  stage: format
+  script:
+    - black --check src/
+    - ruff format --check src/
+
+# ==========================================
 # STAGE: lint
 # ==========================================
 
@@ -31,10 +43,21 @@ python-lint:
   script:
     - ruff check src/
 
-python-format:
+vulture-lint:
   stage: lint
   script:
-    - black --check src/
+    - vulture src/ --min-confidence 80
+
+pylint-lint:
+  stage: lint
+  script:
+    - pylint src/ --disable=all --enable=import-error,useful-imports
+
+pyupgrade-lint:
+  stage: lint
+  script:
+    - pyupgrade --py311-plus src/*.py
+
 
 # ==========================================
 # STAGE: type-check
@@ -58,6 +81,20 @@ dependency-audit:
   stage: security
   script:
     - pip-audit -r requirements.txt -r requirements-dev.txt
+
+semgrep-security:
+  stage: security
+  script:
+    - semgrep --config=auto src/
+
+gitleaks-security:
+  stage: security
+  image: zricethezav/gitleaks
+  before_script: []
+  script:
+    - gitleaks detect --verbose --source .
+
+
 
 secret-scanning:
   stage: security
@@ -95,6 +132,22 @@ python-unittest:
     - PYTHONPATH=. pytest tests/
 
 # ==========================================
+# STAGE: coverage
+# ==========================================
+
+python-coverage:
+  stage: coverage
+  script:
+    - PYTHONPATH=. pytest --cov=src --cov-report=term --cov-report=xml tests/
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+
+# ==========================================
 # STAGE: commit-quality
 # ==========================================
 
@@ -121,6 +174,16 @@ commit-quality:
           print('Please follow the Conventional Commits specification (e.g., feat: add upload route).')
           sys.exit(1)
       "
+
+git-cliff-changelog:
+  stage: commit-quality
+  image: python:3.11-alpine
+  before_script:
+    - apk add --no-cache git
+    - pip install git-cliff
+  script:
+    - git-cliff --config cliff.toml -o CHANGELOG.md
+
 
 # ==========================================
 # STAGE: syntax-validation
