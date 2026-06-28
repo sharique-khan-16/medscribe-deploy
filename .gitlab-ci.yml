@@ -57,32 +57,31 @@ python-security:
 dependency-audit:
   stage: security
   script:
-    # Run audit on requirements to ensure no known vulnerabilities exist
     - pip-audit -r requirements.txt -r requirements-dev.txt
 
 secret-scanning:
   stage: security
   before_script: [] # Skip general pip setup to run fast
   script:
-    # Run a Python-based search script to detect credentials, keys, and high entropy strings
-    - python -c "
-      import os, re;
+    - |
+      python -c "
+      import os, re
       patterns = [
-          re.compile(r'(?i)(password|passwd|secret|api_key|token|auth|credentials)\s*=\s*[\'\"][^\'\"]+[\'\"]'),
+          re.compile(r'(?i)(password|passwd|secret|api_key|token|auth|credentials)\s*=\s*[\x27\x22][^\x27\x22]+[\x27\x22]'),
           re.compile(r'(?i)ghp_[a-zA-Z0-9]{36}')
-      ];
-      found = False;
+      ]
+      found = False
       for root, _, files in os.walk('.'):
           if any(p in root for p in ['.git', '.venv', '.cache']): continue
           for file in files:
-              if file.endswith('.py') or file.endswith('.json') or file.endswith('.md'):
+              if file.endswith(('.py', '.json', '.md')):
                   path = os.path.join(root, file)
                   with open(path, 'r', errors='ignore') as f:
                       for i, line in enumerate(f, 1):
                           for p in patterns:
                               if p.search(line):
-                                  print(f'🚨 Possible Secret Found in {path}:{i} - {line.strip()}');
-                                  found = True;
+                                  print(f'Possible Secret Found in {path}:{i} - {line.strip()}')
+                                  found = True
       if found: exit(1)
       "
 
@@ -104,22 +103,22 @@ commit-quality:
   before_script:
     - apt-get update && apt-get install -y git
   script:
-    # Validate the semantic structure of the last 5 commits
     - git log --format=%s -n 5 > commits.txt
-    - python -c "
-      import re, sys;
-      pattern = re.compile(r'^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)((\([a-z0-9_-]+\))?)?: .+');
-      valid = True;
+    - |
+      python -c "
+      import re, sys
+      pattern = re.compile(r'^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)((\([a-z0-9_-]+\))?)?: .+')
+      valid = True
       with open('commits.txt', 'r') as f:
           for commit in f:
-              commit = commit.strip();
-              if not commit: continue;
+              commit = commit.strip()
+              if not commit: continue
               if not pattern.match(commit):
-                  print(f'❌ Non-semantic commit message detected: \"{commit}\"');
-                  valid = False;
+                  print(f'Non-semantic commit message detected: \"{commit}\"')
+                  valid = False
       if not valid:
-          print('Please follow the Conventional Commits specification (e.g., feat: add upload route).');
-          sys.exit(1);
+          print('Please follow the Conventional Commits specification (e.g., feat: add upload route).')
+          sys.exit(1)
       "
 
 # ==========================================
@@ -131,9 +130,9 @@ yaml-syntax-validation:
   before_script:
     - pip install pyyaml
   script:
-    # Verifies all YAML files are syntactically correct
-    - python -c "
-      import os, yaml;
+    - |
+      python -c "
+      import os, yaml
       for root, _, files in os.walk('.'):
           if any(p in root for p in ['.git', '.venv', '.cache']): continue
           for file in files:
@@ -142,17 +141,17 @@ yaml-syntax-validation:
                   try:
                       with open(path, 'r') as f: yaml.safe_load(f)
                   except Exception as e:
-                      print(f'❌ Invalid YAML: {path} - {e}');
-                      exit(1);
+                      print(f'Invalid YAML: {path} - {e}')
+                      exit(1)
       "
 
 json-syntax-validation:
   stage: lint
   before_script: [] # Skip general pip setup
   script:
-    # Verifies all JSON files are syntactically correct
-    - python -c "
-      import os, json;
+    - |
+      python -c "
+      import os, json
       for root, _, files in os.walk('.'):
           if any(p in root for p in ['.git', '.venv', '.cache']): continue
           for file in files:
@@ -161,6 +160,6 @@ json-syntax-validation:
                   try:
                       with open(path, 'r') as f: json.load(f)
                   except Exception as e:
-                      print(f'❌ Invalid JSON: {path} - {e}');
-                      exit(1);
+                      print(f'Invalid JSON: {path} - {e}')
+                      exit(1)
       "
