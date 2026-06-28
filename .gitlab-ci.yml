@@ -92,7 +92,7 @@ secret-scanning:
 python-unittest:
   stage: test
   script:
-    - PYTHONPATH=. pytest src/
+    - PYTHONPATH=. pytest tests/
 
 # ==========================================
 # STAGE: commit-quality
