@@ -33,7 +33,7 @@ Since this is a two-person team, tasks are parallelized where possible. Sharique
 
 ---
 
-### 🛤️ Harshit's Track (UI & Devops CI)
+### 🛤️ HarshithReddy11's Track (UI & Devops CI)
 
 | Time Block | Target Issue | Goal | Key Deliverables | Risk Level |
 | :--- | :--- | :--- | :--- | :---: |
