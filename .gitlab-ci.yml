@@ -162,4 +162,8 @@ json-syntax-validation:
                   except Exception as e:
                       print(f'Invalid JSON: {path} - {e}')
                       exit(1)
+<<<<<<< HEAD
       "
+=======
+      "
+>>>>>>> 0b999bd (fix: correct YAML syntax error in gitlab-ci pipeline)
