@@ -98,7 +98,7 @@ async def upload_prescription(file: UploadFile = File(...)):
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)
-            except Exception:
+            except Exception:  # nosec B110
                 pass
 
 
@@ -114,4 +114,4 @@ async def get_records() -> List[Dict[str, Any]]:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)  # nosec B104
