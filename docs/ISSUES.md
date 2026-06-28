@@ -1,27 +1,28 @@
 # MedScribe GitLab Issue Backlog
 
-This document contains the complete list of issues ready for import into the self-hosted GitLab instance (`code.swecha.org`). These issues are ordered sequentially to support a single-developer execution pipeline.
+This document contains the complete list of issues ready for import into the self-hosted GitLab instance (`code.swecha.org`). These issues are ordered sequentially to support a two-person development execution pipeline.
 
 ---
 
 ## 📋 Issues Summary Table
 
-| ID | Title | Estimate | Target Completion | Dependencies |
-| :--- | :--- | :---: | :---: | :---: |
-| 1 | Sample Data Collection | 0.5h | 10:30 AM | None |
-| 2 | OCR Ingestion Pipeline (Tesseract Wrapper) | 1.0h | 11:30 AM | Issue 1 |
-| 3 | Ollama Prompting, Schema Parsing & Retry Loop | 1.5h | 01:00 PM | Issue 2 |
-| 4 | SQLite Database Schema & Storage Layer | 0.5h | 01:30 PM | Issue 3 |
-| 5 | FastAPI Backend Service Development | 1.0h | 02:30 PM | Issue 4 |
-| 6 | Frontend UI (Single-Page App) | 1.0h | 03:30 PM | Issue 5 |
-| 7 | Offline Verification Demo Script | 0.5h | 04:00 PM | Issue 3, 4, 5, 6 |
-| 8 | Pre-commit Hooks & CI Security Checks | 1.0h | 05:00 PM | Issue 7 |
+| ID | Title | Estimate | Target Completion | Assignee | Dependencies |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| 1 | Sample Data Collection | 0.5h | 11:00 AM | `@shariquekhan` | None |
+| 2 | OCR Ingestion Pipeline (Tesseract Wrapper) | 1.0h | 12:00 PM | `@shariquekhan` | Issue 1 |
+| 3 | Ollama Prompting, Schema Parsing & Retry Loop | 1.5h | 01:30 PM | `@shariquekhan` | Issue 2 |
+| 4 | SQLite Database Schema & Storage Layer | 0.5h | 02:30 PM | `@shariquekhan` | Issue 3 |
+| 5 | FastAPI Backend Service Development | 1.0h | 03:30 PM | `@shariquekhan` | Issue 4 |
+| 6 | Frontend UI (Single-Page App) | 1.0h | 03:30 PM | `@HarshithReddy11` | Issue 5 (Sync Point) |
+| 7 | Offline Verification Demo Script | 0.5h | 04:00 PM | `@shariquekhan` | Issue 3, 4, 5, 6 |
+| 8 | Pre-commit Hooks & CI Security Checks | 1.0h | 04:30 PM | `@HarshithReddy11` | Issue 7 |
 
 ---
 
 ## 📝 Detailed Issue Descriptions
 
 ### 1. Sample Data Collection
+*   **Assignee:** `@shariquekhan`
 *   **Estimate:** `0.5h`
 *   **Labels:** `phase::2`, `estimate::0.5h`, `component::data`
 *   **Description:**
@@ -33,6 +34,7 @@ This document contains the complete list of issues ready for import into the sel
 ---
 
 ### 2. OCR Ingestion Pipeline (Tesseract Wrapper)
+*   **Assignee:** `@shariquekhan`
 *   **Estimate:** `1.0h`
 *   **Labels:** `phase::2`, `estimate::1.0h`, `component::ocr`
 *   **Description:**
@@ -45,6 +47,7 @@ This document contains the complete list of issues ready for import into the sel
 ---
 
 ### 3. Ollama Prompting, Schema Parsing & Retry Loop
+*   **Assignee:** `@shariquekhan`
 *   **Estimate:** `1.5h`
 *   **Labels:** `phase::2`, `estimate::1.5h`, `component::slm`
 *   **Description:**
@@ -57,6 +60,7 @@ This document contains the complete list of issues ready for import into the sel
 ---
 
 ### 4. SQLite Database Schema & Storage Layer
+*   **Assignee:** `@shariquekhan`
 *   **Estimate:** `0.5h`
 *   **Labels:** `phase::2`, `estimate::0.5h`, `component::storage`
 *   **Description:**
@@ -68,6 +72,7 @@ This document contains the complete list of issues ready for import into the sel
 ---
 
 ### 5. Minimal API (FastAPI Backend)
+*   **Assignee:** `@shariquekhan`
 *   **Estimate:** `1.0h`
 *   **Labels:** `phase::3`, `estimate::1.0h`, `component::api`
 *   **Description:**
@@ -76,10 +81,12 @@ This document contains the complete list of issues ready for import into the sel
     *   Define `/process` endpoint to run the image through OCR, Ollama parsing, validation, and insert results into the SQLite DB.
     *   Define `/records` endpoint (with optional filters) to fetch saved records from the database.
     *   Implement local CORS and exception handlers to gracefully return JSON error responses instead of stack traces.
+    *   *Note:* Ensure output contracts are shared with `@HarshithReddy11` immediately upon definition.
 
 ---
 
 ### 6. Frontend UI (Single-Page App)
+*   **Assignee:** `@HarshithReddy11`
 *   **Estimate:** `1.0h`
 *   **Labels:** `phase::3`, `estimate::1.0h`, `component::ui`
 *   **Description:**
@@ -89,10 +96,12 @@ This document contains the complete list of issues ready for import into the sel
     *   Display real-time processing spinners and extraction confidence metrics (`high`, `medium`, `low`).
     *   Display extracted data in interactive tables (medication cards, lab results table) and allow querying/searching historical records.
     *   Apply premium styling: dark mode, glassmorphism, responsive grids, and micro-animations on actions.
+    *   *Dependency:* Await shared API endpoints and CORS specifications from `@shariquekhan` to finalize AJAX integration.
 
 ---
 
 ### 7. Offline Verification Demo Script
+*   **Assignee:** `@shariquekhan`
 *   **Estimate:** `0.5h`
 *   **Labels:** `phase::3`, `estimate::0.5h`, `component::test`
 *   **Description:**
@@ -104,6 +113,7 @@ This document contains the complete list of issues ready for import into the sel
 ---
 
 ### 8. Pre-commit Hooks & CI Security Checks
+*   **Assignee:** `@HarshithReddy11`
 *   **Estimate:** `1.0h`
 *   **Labels:** `phase::3`, `estimate::1.0h`, `component::ci`
 *   **Description:**

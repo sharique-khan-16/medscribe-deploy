@@ -1,38 +1,69 @@
-# Work Division Plan (Solo Hackathon Timeline)
+# Work Division Plan (Two-Person Team Split)
 
-This document provides a single-developer, time-boxed execution plan for the MedScribe project today. Since this is a solo project, tasks are sequenced linearly to avoid context-switching and resolve dependencies in order.
+This document outlines the parallelized time-boxed execution plan for the MedScribe project today, dividing work between Sharique and Harshit.
+
+---
+
+## 👥 Team Members & Roles
+
+*   **Sharique Khan (@shariquekhan)** — Backend & Core Pipeline Lead
+    *   *Ownership:* Sample data, OCR ingestion, Ollama prompt/validator core loop, SQLite DB layer, FastAPI backend, and offline verification demo script.
+*   **Harshit Reddy (@HarshithReddy11)** — Frontend & Developer Operations Lead
+    *   *Ownership:* Single-page Web UI, styling (dark mode/micro-animations), and pre-commit hook / GitLab CI quality pipeline configuration.
 
 ---
 
 ## 🕒 Chronological Execution Schedule
 
+Since this is a two-person team, tasks are parallelized where possible. Sharique's backend API development acts as the main dependency blocking Harshit's integration phase.
+
+### 🛤️ Sharique's Track (Core Pipeline & API)
+
 | Time Block | Target Issue | Goal | Key Deliverables | Risk Level |
 | :--- | :--- | :--- | :--- | :---: |
-| **09:30 - 10:00** | **N/A** | Phase 1: Planning & Specs | Complete repo structure, spec files, license, and backlog definition. | 🟢 Low |
-| **10:00 - 10:30** | **Issue 1** | Sample Data Setup | Create synthetic/mock medical files for local system testing. | 🟢 Low |
-| **10:30 - 11:30** | **Issue 2** | OCR Pipeline Setup | Build Tesseract wrapper, configure basic OpenCV binarization. | 🟡 Medium |
-| **11:30 - 13:00** | **Issue 3** | Ollama & Schema Parser | Prompting setup, JSON validation loop, repair/retry logic. | 🔴 High |
-| **13:00 - 13:30** | **N/A** | *Lunch Break & Buffer* | Catch up on any delays in the OCR + Ollama pipeline. | 🟢 Low |
-| **13:30 - 14:00** | **Issue 4** | Database Integration | Create SQLite schema, CRUD operations, database connection. | 🟢 Low |
-| **14:00 - 15:00** | **Issue 5** | FastAPI Backend | Implement API endpoints (`/upload`, `/process`, `/records`). | 🟡 Medium |
-| **15:00 - 16:00** | **Issue 6** | Frontend Dashboard | HTML/CSS/JS single-page UI for uploads and record review. | 🟡 Medium |
-| **16:00 - 16:30** | **Issue 7** | Offline Verification | Automated test script to verify processing with Wi-Fi disabled. | 🟡 Medium |
-| **16:30 - 17:30** | **Issue 8** | CI & Pre-commit Hooks | Setup `.pre-commit-config.yaml` and `.gitlab-ci.yml`. | 🟢 Low |
+| **10:00 - 10:30** | **N/A** | Phase 1: Planning & Specs | Align on specifications and schema definitions with Harshit. | 🟢 Low |
+| **10:30 - 11:00** | **Issue 1** | Sample Data Setup | Collect/generate mock prescription and lab report images. | 🟢 Low |
+| **11:00 - 12:00** | **Issue 2** | OCR Pipeline Setup | Build Tesseract wrapper, configure image preprocessing filters. | 🟡 Medium |
+| **12:00 - 13:30** | **Issue 3** | Ollama & Schema Parser | Implement prompt template, schema validator, and retry loop. | 🔴 High |
+| **13:30 - 14:00** | **N/A** | *Lunch Break & Buffer* | Catch up on any delays in the OCR + Ollama pipeline. | 🟢 Low |
+| **14:00 - 14:30** | **Issue 4** | Database Integration | Create SQLite schema, write insertion and query DB layers. | 🟢 Low |
+| **14:30 - 15:30** | **Issue 5** | FastAPI Backend | Implement local API endpoints (`/upload`, `/process`, `/records`). | 🟡 Medium |
+| **15:30 - 16:00** | **Issue 7** | Offline Verification | Create verification script (`verify_offline.py`) to test without Wi-Fi. | 🟡 Medium |
+| **16:00 - 16:30** | **N/A** | Integration & Audit | Sync with Harshit to connect UI with API and perform code audit. | 🟢 Low |
+
+---
+
+### 🛤️ Harshit's Track (UI & Devops CI)
+
+| Time Block | Target Issue | Goal | Key Deliverables | Risk Level |
+| :--- | :--- | :--- | :--- | :---: |
+| **10:00 - 10:30** | **N/A** | Phase 1: Planning & Specs | Align on specs, review inputs, and output JSON schemas. | 🟢 Low |
+| **10:30 - 12:00** | **Issue 6 (Part 1)** | UI Mocking & Static Assets | Build static HTML/CSS structure, configure premium dark mode. | 🟢 Low |
+| **12:00 - 13:30** | **Issue 8 (Part 1)** | Pre-commit Hook Setup | Configure local `.pre-commit-config.yaml` with lint/type checks. | 🟢 Low |
+| **13:30 - 14:00** | **N/A** | *Lunch Break* | Sync with Sharique on Ollama pipeline readiness. | 🟢 Low |
+| **14:00 - 14:30** | **Issue 8 (Part 2)** | GitLab CI Pipeline | Write `.gitlab-ci.yml` runner jobs (security checks, pytest). | 🟡 Medium |
+| **14:30 - 15:30** | **Issue 6 (Part 2)** | UI & API Integration | Connect drag-and-drop uploads and tables to FastAPI endpoints. | 🔴 High |
+| **15:30 - 16:30** | **Issue 8 (Part 3)** | CI Pipeline Testing | Run linting checks locally and verify commits match rules. | 🟢 Low |
+| **16:00 - 16:30** | **N/A** | Integration & Audit | Sync with Sharique to connect UI with API and perform code audit. | 🟢 Low |
+
+---
+
+## 🔄 Sync Points & Dependencies
+
+To ensure parallel tracks run smoothly without blocking each other:
+
+1.  **Contract Freeze (10:30 AM):** Sharique and Harshit finalize and freeze the target output format (`output-schema.json`) so Harshit can mock the API responses in the frontend.
+2.  **API Integration Handshake (14:30 PM):** Sharique shares the FastAPI endpoints and contracts (`/upload`, `/process`, `/records`) with Harshit. Harshit begins pointing frontend AJAX calls to the live local server endpoints.
+3.  **Final Integration Sync (16:00 PM):** Merge branches, run the local server offline, perform cross-component validation, and run pre-commit verification before submission.
 
 ---
 
 ## ⚡ Risk Analysis & Mitigation Strategies
 
-If development time runs short or technical bugs slow down progress, the following prioritizations will be enforced:
-
 ### 1. Non-Negotiable Core (Must Deliver)
-*   **Issue 3 (Ollama/SLM Extraction Loop):** This is the heart of the project. If Ollama formatting fails or has high latency, the entire system breaks. **Mitigation:** Fall back immediately to a simpler system prompt or try `phi3.5:mini` if `qwen2.5:1.5b` behaves unpredictably on CPU.
-*   **Issue 2 (OCR Pipeline):** OCR must yield clean text for the SLM to perform. **Mitigation:** Keep image preprocessing minimal (simple grayscaling and thresholding) unless character recognition is unacceptably low.
+*   **Ollama/SLM Extraction Loop (Sharique):** High risk of output formatting issues. If Sharique falls behind, Harshit will assist by adding basic regex-based JSON cleaning filters.
+*   **API Integration (Harshit + Sharique):** Connecting frontend to backend is a common point of failure. Mitigation: Both will use strict mock JSON files if endpoint communication exhibits CORS or routing errors.
 
-### 2. High Risk/High Complexity (Monitor closely)
-*   **Issue 3 (JSON Schema compliance):** Local models under 3B parameters frequently fail to generate strictly conforming JSON. **Mitigation:** Implement regex-based extraction to extract the JSON block out of the model response, and use standard string-repair techniques (e.g. adding missing brackets/braces) before validation.
-
-### 3. De-prioritized / Scoped-out (Drop if running late)
-*   **Issue 8 (CI & Pre-commit Hooks):** Having 10+ validation checks in CI is valuable for repository health, but can be bypassed temporarily or reduced to standard Python formatting (`ruff` / `black`) if submission is close.
-*   **Issue 7 (Offline Verification Script):** While required for the demo, if time is extremely short, a manual demonstration (turning off Wi-Fi in the OS and running the app through the browser) can suffice instead of debugging automated shell/python network pings.
-*   **Issue 6 (Frontend UI Styling):** If premium styling takes too long, stick to clean semantic HTML with a basic stylesheet first. A working black-and-white functional UI is better than a broken premium page.
+### 2. De-prioritized / Scoped-out (Drop if running late)
+*   **Issue 8 (CI & Pre-commit Hooks):** Harshit can disable non-essential checks (e.g. strict Markdown linting or complex static type checks) if time is running short, keeping only core python linting (`ruff`/`black`) and unit tests.
+*   **Issue 7 (Offline Verification Script):** Sharique can simplify the offline script to a basic execution command and demonstrate offline capability manually if automation debugging is too slow.
