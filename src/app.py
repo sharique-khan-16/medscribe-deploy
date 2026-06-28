@@ -1,6 +1,6 @@
 """MedScribe FastAPI Application."""
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import Dict, Any
@@ -12,7 +12,7 @@ app = FastAPI(
     description="Offline-first medical document digitizer API",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # CORS middleware
@@ -34,7 +34,7 @@ async def root() -> Dict[str, Any]:
         "version": "1.0.0",
         "offline": True,
         "inference_engine": "Ollama (qwen2.5:1.5b)",
-        "ocr_engine": "Tesseract OCR"
+        "ocr_engine": "Tesseract OCR",
     }
 
 
@@ -46,7 +46,7 @@ async def health_check() -> Dict[str, Any]:
         "offline": True,
         "inference_engine": "Ollama (qwen2.5:1.5b)",
         "ocr_engine": "Tesseract OCR",
-        "database": "SQLite"
+        "database": "SQLite",
     }
 
 
@@ -66,7 +66,10 @@ async def not_found_handler(request, exc):
     """Custom 404 handler."""
     return JSONResponse(
         status_code=404,
-        content={"error": "Not found", "message": "The requested resource was not found"}
+        content={
+            "error": "Not found",
+            "message": "The requested resource was not found",
+        },
     )
 
 
@@ -75,12 +78,16 @@ async def internal_error_handler(request, exc):
     """Custom 500 handler."""
     return JSONResponse(
         status_code=500,
-        content={"error": "Internal server error", "message": "An unexpected error occurred"}
+        content={
+            "error": "Internal server error",
+            "message": "An unexpected error occurred",
+        },
     )
 
 
 if __name__ == "__main__":
     import uvicorn
+
     port = int(os.getenv("PORT", 8000))
     host = os.getenv("HOST", "0.0.0.0")
     uvicorn.run(app, host=host, port=port)
