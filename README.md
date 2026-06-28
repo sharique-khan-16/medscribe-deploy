@@ -92,6 +92,71 @@ pip install -r requirements.txt
 
 ---
 
+## 🚀 Deployment
+
+MedScribe can be deployed to Render for free hosting with a public URL.
+
+### Deploy to Render
+
+1. **Push to GitLab:**
+   ```bash
+   git add .
+   git commit -m "feat: add deployment configuration for Render"
+   git push origin main
+   ```
+
+2. **Connect to Render:**
+   - Go to [Render Dashboard](https://dashboard.render.com/)
+   - Click "New +" → "Web Service"
+   - Connect your GitLab repository: `https://code.swecha.org/shariquekhan/hackathon-3`
+   - Render will auto-detect the `render.yaml` configuration
+
+3. **Deployment Settings (auto-configured):**
+   - **Runtime:** Python 3.11
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `uvicorn src.app:app --host 0.0.0.0 --port $PORT`
+   - **Plan:** Free
+
+4. **Environment Variables:**
+   The following are pre-configured in `render.yaml`:
+   - `PYTHON_VERSION=3.11.9`
+   - `PORT=8000`
+
+5. **Deploy:**
+   - Click "Create Web Service"
+   - Render will build and deploy automatically
+   - Your app will be available at: `https://medscribe-api.onrender.com`
+
+### Verify Deployment
+
+Once deployed, verify the service is running:
+```bash
+curl https://medscribe-api.onrender.com/health
+```
+
+Expected response:
+```json
+{
+  "status": "healthy",
+  "offline": true,
+  "inference_engine": "Ollama (qwen2.5:1.5b)",
+  "ocr_engine": "Tesseract OCR",
+  "database": "SQLite"
+}
+```
+
+### API Documentation
+
+After deployment, access:
+- **Swagger UI:** `https://medscribe-api.onrender.com/docs`
+- **ReDoc:** `https://medscribe-api.onrender.com/redoc`
+
+### Notes
+
+- The free tier on Render may spin down after 15 minutes of inactivity
+- First request after spin-down may take 30-60 seconds to respond
+- For production use, consider upgrading to a paid plan for always-on service
+
 ## 🔒 Offline Proof (Verification Guide)
 
 To prove that MedScribe is 100% offline and does not leak any data, perform the following verification:
