@@ -1,0 +1,18 @@
+stages:
+  - lint
+  - test
+
+lint:
+  image: python:3.11
+  stage: lint
+  script:
+    - pip install -r requirements.txt
+    - pip install pre-commit
+    - pre-commit run --all-files
+
+test:
+  image: python:3.11
+  stage: test
+  script:
+    - pip install -r requirements.txt
+    - pytest -q
