@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import List, Optional, Literal
+from typing import Literal
 from pydantic import BaseModel, Field, ValidationError
 import ollama
 

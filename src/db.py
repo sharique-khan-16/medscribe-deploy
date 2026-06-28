@@ -2,7 +2,7 @@
 
 import os
 import sqlite3
-from typing import Dict, Any, List
+from typing import Any
 from src.extractor import ExtractionResult
 
 DB_PATH = os.path.join("data", "medscribe.db")
