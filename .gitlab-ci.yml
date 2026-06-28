@@ -179,7 +179,7 @@ commit-quality:
 
 git-cliff-changelog:
   stage: commit-quality
-  image: orhun/git-cliff:latest
+  image: orhunp/git-cliff:latest
   before_script: []
   script:
     - git-cliff --config cliff.toml -o CHANGELOG.md
