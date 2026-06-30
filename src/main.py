@@ -6,7 +6,8 @@ import shutil
 from typing import Any
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from src.ocr import extract_text
 from src.extractor import extract_data, ExtractionResult
@@ -37,8 +38,11 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.get("/", include_in_schema=False)
 async def root():
-    """Redirect root URL to interactive API docs."""
-    return RedirectResponse(url="/docs")
+    """Serve the MedScribe PWA frontend."""
+    return FileResponse(os.path.join("static", "index.html"))
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 def get_status() -> dict[str, Any]:

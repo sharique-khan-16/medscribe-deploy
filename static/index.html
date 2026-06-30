@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedScribe — Offline Document Digitizer</title>
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#1B4B43">
+<link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F7F3EC;
+    --paper-dim: #EFE9DD;
+    --teal: #1B4B43;
+    --teal-deep: #123530;
+    --amber: #C9762C;
+    --ink: #1A1A1A;
+    --sage: #A8BFA8;
+    --sage-line: #C7D4C2;
+    --danger: #A8412E;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Roboto Slab', serif;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 3px solid var(--ink);
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+
+  .brand h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+    color: var(--teal-deep);
+  }
+
+  .brand p {
+    margin: 4px 0 0;
+    font-size: 0.78rem;
+    color: #5b5b54;
+    letter-spacing: 0.02em;
+  }
+
+  .stamp {
+    border: 2.5px solid var(--amber);
+    color: var(--amber);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-family: 'Roboto Slab', serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transform: rotate(-3deg);
+    white-space: nowrap;
+    transition: all 0.25s ease;
+  }
+  .stamp.online {
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  section {
+    background: #fff;
+    border: 1px solid var(--sage-line);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  section h2 {
+    font-size: 1rem;
+    margin: 0 0 14px;
+    color: var(--teal-deep);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  section h2 .num {
+    background: var(--teal);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .drop {
+    border: 2px dashed var(--sage);
+    border-radius: 6px;
+    padding: 28px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .drop:hover, .drop.drag {
+    border-color: var(--amber);
+    background: #fbf6ec;
+  }
+  .drop p { margin: 6px 0 0; font-size: 0.78rem; color: #6b6b62; }
+  .drop strong { color: var(--teal-deep); font-family: 'Roboto Slab', serif; }
+  input[type=file] { display: none; }
+
+  .filename {
+    margin-top: 12px;
+    font-size: 0.8rem;
+    color: var(--teal-deep);
+    word-break: break-all;
+  }
+
+  button {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background: var(--teal);
+    color: var(--paper);
+    border: none;
+    border-radius: 4px;
+    padding: 11px 18px;
+    cursor: pointer;
+    margin-top: 14px;
+    transition: background 0.2s;
+  }
+  button:hover { background: var(--teal-deep); }
+  button:disabled { background: #b8b8ae; cursor: not-allowed; }
+
+  .result, .record {
+    background: var(--paper-dim);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 4px 4px 0;
+    padding: 12px 14px;
+    margin-top: 14px;
+    font-size: 0.78rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .result.error {
+    border-left-color: var(--danger);
+    color: var(--danger);
+  }
+
+  .empty {
+    font-size: 0.8rem;
+    color: #8a8a80;
+    font-style: italic;
+    padding: 8px 0;
+  }
+
+  .refresh-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .refresh-row button {
+    margin-top: 0;
+    background: var(--sage);
+    color: var(--teal-deep);
+  }
+  .refresh-row button:hover { background: #93ab8e; }
+
+  footer {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #8a8a80;
+    margin-top: 30px;
+    line-height: 1.6;
+  }
+  footer a { color: var(--teal); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <h1>MedScribe</h1>
+      <p>Offline document digitizer · OCR + local AI</p>
+    </div>
+    <div class="stamp" id="connStamp">checking…</div>
+  </header>
+
+  <section>
+    <h2><span class="num">1</span>Upload a document</h2>
+    <div class="drop" id="dropZone">
+      <strong>Tap to choose a file</strong>
+      <p>Prescription or lab report — JPG, PNG, or PDF</p>
+      <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf">
+    </div>
+    <div class="filename" id="filename"></div>
+    <button id="uploadBtn" disabled>Process document</button>
+    <div id="uploadResult"></div>
+  </section>
+
+  <section>
+    <div class="refresh-row">
+      <h2><span class="num">2</span>Saved records</h2>
+      <button id="refreshBtn">Refresh</button>
+    </div>
+    <div id="recordsList"><div class="empty">Loading…</div></div>
+  </section>
+
+  <footer>
+    Backend target: <span id="baseUrlLabel"></span><br>
+    For full offline OCR + AI extraction, run the MedScribe backend locally per the
+    <a href="https://code.swecha.org/shariquekhan/hackathon-3" target="_blank">README</a>.
+  </footer>
+
+</div>
+
+<script>
+  const BASE_URL = window.location.origin;
+  document.getElementById('baseUrlLabel').textContent = BASE_URL;
+
+  const stamp = document.getElementById('connStamp');
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const filenameEl = document.getElementById('filename');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const uploadResult = document.getElementById('uploadResult');
+  const recordsList = document.getElementById('recordsList');
+  const refreshBtn = document.getElementById('refreshBtn');
+
+  let selectedFile = null;
+
+  async function checkHealth() {
+    try {
+      const res = await fetch(BASE_URL + '/health', { cache: 'no-store' });
+      if (!res.ok) throw new Error();
+      stamp.textContent = 'Online';
+      stamp.classList.add('online');
+    } catch {
+      stamp.textContent = 'Offline';
+      stamp.classList.remove('online');
+    }
+  }
+
+  async function loadRecords() {
+    recordsList.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      const res = await fetch(BASE_URL + '/records', { cache: 'no-store' });
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        recordsList.innerHTML = '<div class="empty">No records yet. Upload a document above to get started.</div>';
+        return;
+      }
+      recordsList.innerHTML = '';
+      data.forEach(rec => {
+        const div = document.createElement('div');
+        div.className = 'record';
+        div.textContent = JSON.stringify(rec, null, 2);
+        recordsList.appendChild(div);
+      });
+    } catch (err) {
+      recordsList.innerHTML = '<div class="empty">Could not reach the backend. Start it locally to view records offline.</div>';
+    }
+  }
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag');
+    if (e.dataTransfer.files.length) {
+      selectedFile = e.dataTransfer.files[0];
+      filenameEl.textContent = selectedFile.name;
+      uploadBtn.disabled = false;
+    }
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) {
+      selectedFile = fileInput.files[0];
+      filenameEl.textContent = selectedFile.name;
+      uploadBtn.disabled = false;
+    }
+  });
+
+  uploadBtn.addEventListener('click', async () => {
+    if (!selectedFile) return;
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Processing…';
+    uploadResult.innerHTML = '';
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const res = await fetch(BASE_URL + '/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      const div = document.createElement('div');
+      div.className = res.ok ? 'result' : 'result error';
+      div.textContent = JSON.stringify(data, null, 2);
+      uploadResult.appendChild(div);
+      if (res.ok) loadRecords();
+    } catch (err) {
+      const div = document.createElement('div');
+      div.className = 'result error';
+      div.textContent = 'Request failed: ' + err.message;
+      uploadResult.appendChild(div);
+    } finally {
+      uploadBtn.disabled = false;
+      uploadBtn.textContent = 'Process document';
+    }
+  });
+
+  refreshBtn.addEventListener('click', loadRecords);
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+    });
+  }
+
+  checkHealth();
+  loadRecords();
+  setInterval(checkHealth, 15000);
+</script>
+</body>
+</html>

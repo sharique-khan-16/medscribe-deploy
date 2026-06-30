@@ -22,6 +22,7 @@ COPY src/ ./src/
 COPY data/samples/ ./data/samples/
 COPY tests/ ./tests/
 COPY cliff.toml USER_MANUAL.md ./
+COPY static/ ./static/
 
 # Expose FastAPI server port
 EXPOSE 8000
